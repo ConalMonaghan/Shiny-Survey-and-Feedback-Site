@@ -1,0 +1,101 @@
+##################################################################
+### This is the code for the new scale applet                  ###
+### Divided into sections for frequentist estimation           ###
+###                                                            ###
+###      Credit for Shiny Template should be given to          ###
+###     Conal Monaghan, Australian National University         ###
+###   For Original version and Ideas for expansion see         ###
+# https://conalmonaghan.shinyapps.io/two-dimensional_machiavellianism/# 
+###                                                            ###
+###            All communication can be made to                ###
+#                  conal.monaghan@anu.edu.au                     #
+##################################################################
+
+
+###########################################################
+## This is the server logic for a Shiny web application. ##
+## This turns the inputs into outputs                    ##
+###########################################################
+
+## Setup the app
+library(shiny)
+library("tigerstats")
+library(mirt)
+library(shinydashboard)
+library("googlesheets")
+library(dplyr)   ## Note that there has been some issues with the Purr package (Dependency within Dplyr), on CRAN. If PURR creates issues, install an earlier version of Dplyr and all should work well
+
+## See additional info in the github repo if you need help setting this up. 
+
+# Setup Token for storing data (Stored in dir()) -> use the googlesheets package to create a ttt.rds token for your googledrive account. 
+gs_auth(new_user = FALSE, gs_auth(token = "ttt.rds")) # Store the ttt.rds file in your working directory. Therefore, it will automatically login when uses create an instance 
+Data <- gs_key("XXXXXXXXXXXXX")   ## Write your GS key for the google sheet you want to add data to. Use the KEY not file name, File names create issues !!!!
+
+shinyServer(function(input, output) {     ## Opens the server side
+
+  # Calculate overall scores by summing items 1-16. You can do any kind of calculations here. Including subscales etc 
+  
+Score <- reactive({as.numeric(
+    (as.numeric(input$Score1) + as.numeric(input$Score2) + as.numeric(input$Score3) + as.numeric(input$Score4) + as.numeric(input$Score5) + as.numeric(input$Score6) +
+       as.numeric(input$Score7) + as.numeric(input$Score8) + as.numeric(input$Score9) + as.numeric(input$Score10) + as.numeric(input$Score11) +
+       as.numeric(input$Score12) + as.numeric(input$Score13) + as.numeric(input$Score14) + as.numeric(input$Score15) + as.numeric(input$Score16))/16
+                        )})
+
+############### Create Plot  ######################
+  output$Curve <- renderPlot({
+    pnormGC(Score(),region="below", mean=XX.XX,   ## Insert data and SD from population sample
+            sd=XX.XX,graph=TRUE)
+                               })
+  
+  
+  ############### Create Text  ######################
+  
+  output$Output <- renderText({ 
+    paste("You have received an estimated overall score of", Score(),  "You scored higher than, ", round(pnormGC((Score()), region="below", mean=XX.XX, sd=XX.XX)*100, 2), "% of your peers,
+          with a confidence interval (95%) ranging from", round(pnormGC((Score() - XX.XX), region="below", mean=XX.XX, sd=XX.XX)*100, 2), "to",
+          round(pnormGC((Score() + .XX), region="below", mean=XX.XX, sd=XX.XX)*100, 2), ". The plot above shows where you sat compared to your peers, with higher scores as your move right, and the coloured in section representing peers you scored higher than.")
+                                  })
+  
+                                       ################# Setup Data download    ##########################
+  
+  ## Dataset for established using the following on the ttt token
+  ## If you do not have a dataset in the repo on your Google drive, then use the following code. 
+# Data <- gs_new("Data") %>%                                                                # Establish new Dataset
+#             gs_ws_rename(from = "Sheet1", to = "Data")                                        # Establish new Worksheet
+# Setupvalues <- rbind(c("Time", "Score1", "Score2", "Score3", "Score4", "Score5", "Score6", "Score7", "Score8", "Score9", "Score10", "Score11", "Score12", "Score13", "Score14", "Score15", "Score16", 
+#                      "Score",
+#                          "Gender", "Age", "Ethnicity", "Country", "eco_Liberal",  "Soc_Liberal", "Religiousness", "Agree", "Accuracy"),
+#                           c(seq(1,29))
+#                    )
+#  Data <- Data  %>%
+#              gs_edit_cells(ws = "Data", input = Setupvalues, trim = TRUE)                  # Change frame to appropriate and add setup values
+# files in google sheets can be accessed through   > gs_ls() 
+  
+  
+  
+         ### Make a Results vector comprising the participant data which we can then add to our Google data
+  Results <- reactive(c(
+                      input$Score1, input$Score2, input$Score3, input$Score4, input$Score5, input$Score6, input$Score7, input$Score8, input$Score9, input$Score10, input$Score11, input$Score12, input$Score13, input$Score14, input$Score15, input$Score16,
+                      Score(),
+                      input$Gender, input$Age, input$Ethnicity, input$Country, input$eco_Liberal, input$Soc_Liberal, input$Religiousness, input$Agree, input$Real,
+                      Sys.time()
+                      ))
+                      
+ ### Reactive function to send data to Google. This will add the new row at the bottom of the dataset in Google Sheets
+observeEvent(input$n, {                                                                 #  Observe event action from Actionbutton
+Data  <- Data  %>%                                                                      ## Occasionally there are some issues if there is not at least 1-2 rows of data in the file. Best to make suedo data 
+gs_add_row(ws = "Data", input = Results())                                              #  When actionbutton is pressed this will add their data to the good .doc                    
+                      }
+              )
+
+### Full download
+Filename <- paste0("Website Data", Sys.Date(), ".xlsx")         # Label the filename, with date
+
+observeEvent(input$Fulldownload, {    ## Creates the download of Data into the GS file
+           gs_title("Data") %>% 
+           gs_download(to = Filename)    }
+           )
+
+
+})   # Close whole server code
+    
