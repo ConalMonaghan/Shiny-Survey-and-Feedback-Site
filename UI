@@ -1,0 +1,303 @@
+##################################################################
+### This is the code for the new scale applet                  ###
+### Divided into sections for frequentist estimation           ###
+###                                                            ###
+###      Credit for Shiny Template should be given to          ###
+###     Conal Monaghan, Australian National University         ###
+###   For Original version and Ideas for expansion see         ###
+# https://conalmonaghan.shinyapps.io/two-dimensional_machiavellianism/# 
+###                                                            ###
+###            All communication can be made to                ###
+#                  conal.monaghan@anu.edu.au                     #
+##################################################################
+
+
+###########################################################
+## This is the UI logic for a Shiny web application.     ##
+## This turns the Produces what Users see                ##
+###########################################################
+
+
+# Setup 
+library(shiny)
+library(shinydashboard)
+library("googlesheets")
+library("DT")
+
+shinyUI( 
+  dashboardPage(skin = "blue", # UI = User interface, this produces .html code for the end user. UI object
+                # Application title
+                dashboardHeader(title = "Your cool measurement website", titleWidth = 500),
+                
+               
+                
+                # Set out the tabs.
+                dashboardSidebar(sidebarMenu(
+                                             
+                                             menuItem("Welcome", tabName = "About", icon = icon("child")),
+                                          
+                                             menuItem("Test Yourself", tabName = "Test", icon = icon("bar-chart-o")),
+                                          
+                                             menuItem("Researcher Resources", tabName = "Researchers", icon = icon("rebel"))
+                                             # If you want to add more tabs, add these here in the form of menuItem("WHAT YOUR USERS WILL SEE", tabName = "WHAT YOU WILL REFER TO IT IN THE CODE")
+                                             )
+                               ),   # This closes the menu options
+                
+                # Now the full body
+                
+               
+                              tabItems(                                         # Start the tab items
+                  tabItem(tabName = "About",                                    #  html. title
+                          box(title = "Welcome",  width = 40,                   #  Start About Tab
+                             
+                                      "Here you can place info about your scale"
+                          )),    # Close tab item 1
+
+                  tabItem(tabName = "Test",   tags$title("Your Test"),  # Start Test Tab and html title tag
+                          h2("Test Yourself"),
+                          # Sidebar with the scale items
+                          
+                  conditionalPanel("input.m == 0",   ## here you can place intro information your scale. e.g., participant info sheet and risk management things.
+                                   
+                                   
+                                   tags$b("Receiving your results is, in no way, based on whether you want your data included in the study. Therefore, you will still receive your results if you do not want your results included"),
+
+                                    tags$br(), "Contact us for more information on the study, your rights as a participant, data storage and collection, and ethics",
+                                    
+                                                                          
+                                     "If you agree and wish to take the test enter click proceed", tags$br(), # Click the button to proceed to your survey
+                                   
+                                     actionButton(inputId = "m", label = "Proceed", icon = NULL)   ),  ## Conditional Panel for Approval   
+                  
+                  conditionalPanel("input.m == 1",        ### This will allow the Participants to see the survey only after agreeing to the terms
+                          
+                  conditionalPanel("input.n == 0",         ## Start the conditional Panel for the survey, this nests within M
+                               box(width = 100,
+                          
+                              
+                              "Please indicate how much you agree or disagree with the following statements.
+                              Note that there are no right or wrong answers, and that your responses are not recorded
+                              in any way. Try to answer how each statement relates to you over the past year, not how you
+                              are feeling currently.",
+                              tags$hr(), 
+                              
+                              selectInput(inputId = "Score1",                                # What we are calling the object
+                                          label = "Item 1 Content",                                                             # Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                              ), 
+                              selectInput(inputId = "Score2",                   # What we are calling the object
+                                          label = "Item 2 Content",                          #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score3",                   # What we are calling the object
+                                          label = "Item 3 Content",                                               #  Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score4",                   # What we are calling the object
+                                          label = "Item 4 Content",                                                #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score5",                   # What we are calling the object
+                                          label = "Item 5 Content",                  #  Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score6",                   # What we are calling the object
+                                          label = "Item 6 Content",                                                         #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score7",                   # What we are calling the object
+                                          label = "Item 7 Content",                            #  Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score8",                   # What we are calling the object
+                                          label = "Item 8 Content",                            #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score9",                   # What we are calling the object
+                                          label = "Item 9 Content",                                                             #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score10",                   # What we are calling the object
+                                          label = "Item 10 Content",                     #  Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score11",                   # What we are calling the object
+                                          label ="Item 11 Content",                                                        #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score12",                   # What we are calling the object
+                                          label = "Item 12 Content",                               #  Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score13",                   # What we are calling the object
+                                          label = "Item 13 Content",                                      #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score14",                   # What we are calling the object
+                                          label = "Item 14 Content",                                          #  Question 
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                             ),
+                              selectInput(inputId = "Score15",                   # What we are calling the object
+                                          label = "Item 15 Content",                                                    #  Question
+                                          choices = c("Disagree Strongly" = 7, "Disagree" = 6, "Disagree Somewhat " = 5, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 3, "Agree" = 2,
+                                                      "Agree Strongly" = 1),
+                                          selected = 4
+                              ),
+                              selectInput(inputId = "Score16",                   # What we are calling the object
+                                          label = "Item 16 Content",                                              #  Question
+                                          choices = c("Disagree Strongly" = 1, "Disagree" = 2, "Disagree Somewhat " = 3, 
+                                                      "Neither Agree nor Disagree" = 4, "Agree Somewhat" = 5, "Agree" = 6,
+                                                      "Agree Strongly" = 7),
+                                          selected = 4
+                             ),
+                                   tags$br(),tags$hr(),        # Add some space so that the text sits nicely below
+                              
+                             
+                              ## Here we can put some additional Demographic questions 
+                             
+                             
+                                 h4("Here are some additional questions that will eventually allow us to create more accurate estimates of Machiavellianism. These are optional and will not alter 
+                                    your estimate but will allow us to create more accurate estimates in the future"),tags$br(),
+                               
+                              # Ethnicity 
+                              textInput("Ethnicity", label = "What is your ethnicity (e.g., Caucasian, Asian, African-American)", 
+                                        value = "Enter your ethnicity here"),
+                              
+                              # Gender 
+                              selectInput(inputId = "Gender",##                                                                          # What we are calling the object
+                                          label = "What is your gender identity?",                                                          # Question
+                                          choices = c("Female" = 1, "Male" = 2, "Trans/intersex, other" = 3,                                        # Responses
+                                                      "Prefer not to say" = 4)            
+                                          ), 
+                             
+                              
+                              # Country
+                              textInput("Country", label = "What country are you from?", 
+                                                    value = "Enter your country here"), 
+                              
+                              #Age
+                              textInput("Age", label = "What is your age?", 
+                                        value = "Enter your Age"), 
+                              
+                              # Economic Liberalism 
+                              sliderInput("eco_Liberal", label = "What is your stance on government involvement in economics (economic liberalism)? 
+                                                                  Ranging from a free market with negligible government involvement from a minimal government 
+                                                                  - that is, people should be free to run their businesses and accumulate wealth as they
+                                                                  feel fit with no / minimal taxation (0), to, all markets should be strictly controlled by a large government to
+                                                                  spread wealth equally and to control against exploitation - heavy taxation with highly regulated markets (100)",
+                                         min = 0, max = 100, value = 50),
+                              
+                              # Social Liberalism 
+                              sliderInput("Soc_Liberal", label = "What is your stance on government involvement in society? Ranging from a government should have no influence on society
+                                                                 (social liberalism) - we should be free to believe, love, and do what we want (0), to, the government must stringently control 
+                                                                  what is acceptable in society, what people believe, and who they marry (social conservativism) (100)",
+                                          min = 0, max = 100, value = 50),
+                              
+                              #Religiousness
+                              sliderInput("Religiousness", label = "How religious are you? Ranging from not at all / athiest (0) to devout/literalist religious beliefs (100)",
+                                          min = 0, max = 100, value = 50),
+                              
+                              # Accuracy 
+                              selectInput(inputId = "Real",                                                                                                # What we are calling the object
+                                          label = "How accurately did you answer the questions?",                                                          # Question
+                                          choices = c("Skimmed the questions without reading / did not respond accurately" = 1, "Briefly read the questions and responded" = 2, "Read the questions and answered accurately" = 3,                                                    # Responses
+                                                      "Read each question in depth and thought conscientiously about each response" = 4)            
+                                            ), 
+                              
+                              # Agree?
+                              radioButtons("Agree", label = h3("Do you consent to having your anonymous data stored for research"),   # insert Radio for data storage consent
+                                           choices = list("Sure" = 1, "No, erase all evidence I was here" = 2
+                                           )),
+                              
+                              
+                              ###  Submit and Continue to results,
+                              
+                              actionButton(inputId = "n", label = "Submit and get your Score", icon = icon("user-circle")) ## insert the survey / results selector
+                                 
+                                 ### This is the action button which changed N from 0 to 1. (Still all within the M box)
+                              
+                                    )   #   Close Box within N ==0
+                               ),      #    Close Conditional panel for survey n == 0  ( the Survey questions)
+                  
+                  
+                           
+                          conditionalPanel("input.n == 1",         ## Start the conditional Panel for the Results, N == 1
+                         
+                  
+                    tabBox(                                         ## Start Tabbox for results
+                    title = "Your Results", width = 100,
+
+                        tabPanel("Compared to our normative sample",     # Table Panel 1 Open
+                              h2("Put information about the norms and what people's scores mean here."),
+                                                          
+                                   h2("Your Score"), plotOutput("Curve"), textOutput("hOutput")   ## Here is where the rShiny score feeds things back to them
+      
+                                     # Table Panel 1 Close
+                          
+                                 )   # Close Tab Panel
+                  
+                             )  ## Close Tab Box
+                        )     ## Close input.n == 1 conditional Panel for survey vs results
+                  )   # Close Box for your results m = 1 for Participant info vs Survey
+            ),  # Close Results tab item
+                  
+                
+                  
+                  tabItem(tabName = "Info about us",                                 # Start researcher tab 
+                          box(title = "Info about us", width = 10,
+                              
+                              "Place information about you here!"
+                              
+                              ) # Close box
+                         ) # Close info about us                    
+            
+                ## IF you want to Add more tabs, add these here and then make sure to add new Tab items into the dashboardSidebar(sidebarMenu()) section at the beginning
+            
+                   )                                                         # Close Tab items
+                   
+          )                                                              # Dashboard dashboardPage
+                                                                          
+)     # Full UI close
