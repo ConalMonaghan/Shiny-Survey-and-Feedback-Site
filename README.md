@@ -2,6 +2,10 @@
 
 The shiny source code for open-source survey adminstration and data collection site the comprises two files, the server and the UI which was used within the publication of the paper and Conal Monaghan's PhD thesis. You will need a shiny.io account (only get the free version -> you do not need server level access), R and Rstudio. To find out more information about the Machiavellianism site, scale, or research feel free to visit the website (https://conalmonaghan.shinyapps.io/two-dimensional_machiavellianism/), and or contact me at:
        Conal.Monaghan@anu.edu.au
+  
+ ## Acknowledgement 
+ You are free to use and modify this code without as you wish. If you do, please acknowledge Conal Monaghan for website design
+       
 
 ## Website Code
 
