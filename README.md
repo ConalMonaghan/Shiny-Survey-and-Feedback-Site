@@ -4,7 +4,9 @@ The shiny source code for open-source survey adminstration and data collection s
        Conal.Monaghan@anu.edu.au
   
  ## Acknowledgement 
- You are free to use and modify this code without as you wish. If you do, please acknowledge Conal Monaghan for website design
+ You are free to use and modify this code without as you wish. If you do, please acknowledge Conal Monaghan for website design.
+ 
+ I am licencing this under Apache 2.0 licencing. 
        
 
 ## Website Code
