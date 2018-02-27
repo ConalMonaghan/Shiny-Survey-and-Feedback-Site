@@ -199,7 +199,7 @@ shinyUI(
                               ## Here we can put some additional Demographic questions 
                              
                              
-                                 h4("Here are some additional questions that will eventually allow us to create more accurate estimates of Machiavellianism. These are optional and will not alter 
+                                 h4("Here are some additional questions that will help with our research. These are optional and will not alter 
                                     your estimate but will allow us to create more accurate estimates in the future"),tags$br(),
                                
                               # Ethnicity 
